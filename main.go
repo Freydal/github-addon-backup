@@ -1,7 +1,11 @@
+/*
+Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+
+*/
 package main
 
-import "log"
+import "github-addon-backup/cmd"
 
-func main()  {
-	log.Println("Hi Place!")
+func main() {
+	cmd.Execute()
 }
