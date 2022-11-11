@@ -1,50 +1,47 @@
 package git
 
 import (
+	"fmt"
 	gitClient "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"log"
-	"path/filepath"
 )
 
-func CleanAndPullRepo(path string, installation string) error {
-	log.Println("Clean and pull", path, installation)
-
-	addonsPath := filepath.Join(path, "interface", "addons")
-	//Addons
-	c, err := gitClient.PlainOpen(addonsPath)
+func CleanAndPullRepo(path string, branch string) error {
+	c, err := gitClient.PlainOpen(path)
 	if err != nil {
-		log.Fatal("Plain Open Failed", err)
+		if err.Error() == "repository does not exist" {
+			return nil
+		}
+		return err
 	}
 
-	log.Println("Opened", addonsPath)
+	log.Println(fmt.Sprintf("Clean and pull %s (%s)", path, branch))
 
 	w, err := c.Worktree()
 	if err != nil {
-		log.Fatal("Worktree failed", err)
+		return err
 	}
 
 	err = w.Clean(&gitClient.CleanOptions{})
 	if err != nil {
-		log.Fatal("Clean failed", err)
+		return err
 	}
 
 	err = w.Checkout(&gitClient.CheckoutOptions{
-		Branch: plumbing.NewBranchReferenceName(installation),
+		Branch: plumbing.NewBranchReferenceName(branch),
 	})
 	if err != nil {
-		log.Fatal("Checkout failed", err)
+		return err
 	}
-
-	//sshAuth, err := gitClientSSH.DefaultAuthBuilder("")
-	//log.Println(sshAuth.String())
-	//log.Println(sshAuth.Name())
-	//
-	//fffaa, err := sshAuth.ClientConfig()
 
 	err = w.Pull(&gitClient.PullOptions{})
 	if err != nil {
-		log.Fatal("Pull failed", err)
+		if err.Error() == "already up-to-date" {
+			log.Println("Up to date!")
+		} else {
+			return err
+		}
 	}
 
 	return nil
