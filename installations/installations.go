@@ -20,9 +20,8 @@ func KeepUpToDate(rootPath string) {
 	}
 	for _, dir := range dirs {
 		log.Println(dir)
-
-		if strings.HasPrefix(dir, "__") {
-			go git.CleanAndPullRepo(fmt.Sprintf("%s%s%s", rootPath, string(os.PathSeparator), dir), dir)
+		if strings.HasPrefix(dir, "_") {
+			git.CleanAndPullRepo(fmt.Sprintf("%s%s%s", rootPath, string(os.PathSeparator), dir), dir)
 		}
 	}
 
