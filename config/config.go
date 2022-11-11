@@ -13,7 +13,7 @@ func DefaultPathAndMessage() (string, string) {
 		path := ""
 		return path, baseMessage + path
 	case "darwin":
-		path := "/Applications/World\\ of\\ Warcraft"
+		path := "/Applications/World of Warcraft"
 		return path, baseMessage + path
 	default:
 		log.Fatalf("Runtime %s NYI", runtime.GOOS)
