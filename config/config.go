@@ -5,18 +5,17 @@ import (
 	"runtime"
 )
 
-func DefaultPathAndMessage() (string, string) {
-	baseMessage := "Base directory for World of Warcraft installation. -- default: "
+func DefaultPathAndMessage() string {
 
 	switch runtime.GOOS {
 	case "windows":
-		path := ""
-		return path, baseMessage + path
+		path := "D:\\Program Files (x86)\\World of Warcraft"
+		return path
 	case "darwin":
 		path := "/Applications/World of Warcraft"
-		return path, baseMessage + path
+		return path
 	default:
 		log.Fatalf("Runtime %s NYI", runtime.GOOS)
-		return "", ""
+		return ""
 	}
 }

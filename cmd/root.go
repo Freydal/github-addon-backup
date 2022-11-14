@@ -37,9 +37,9 @@ func Execute() {
 }
 
 func init() {
-	defaultPath, pathMessage := config.DefaultPathAndMessage()
+	defaultPath := config.DefaultPathAndMessage()
 
-	rootCmd.Flags().StringVarP(&baseWowDir, "base-wow-directory", "d", defaultPath, pathMessage)
+	rootCmd.Flags().StringVarP(&baseWowDir, "base-wow-directory", "d", defaultPath, "Base directory for World of Warcraft installation.")
 	rootCmd.Flags().BoolVarP(&pull, "pull", "p", false, "Help message for toggle")
 }
 
