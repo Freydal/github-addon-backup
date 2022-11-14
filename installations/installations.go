@@ -45,5 +45,42 @@ func KeepUpToDate(rootPath string) {
 			}
 		}
 	}
+}
 
+func UpdateDaily(rootWowDirPath string) {
+	rootWowDirFile, err := os.Open(rootWowDirPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dirs, err := rootWowDirFile.Readdirnames(0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, dir := range dirs {
+		if strings.HasPrefix(dir, "_") {
+			//Addons
+			addonsPath := filepath.Join(rootWowDirPath, dir, "interface", "addons")
+			if err := git.DailyPush(addonsPath, dir); err != nil {
+				log.Println(err)
+			}
+
+			wtfAccountPath := filepath.Join(rootWowDirPath, dir, "WTF", "Account")
+			wtfAccount, err := os.Open(wtfAccountPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			accounts, err := wtfAccount.Readdirnames(0)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, account := range accounts {
+				accountPath := filepath.Join(wtfAccountPath, account)
+				if err := git.DailyPush(accountPath, dir); err != nil {
+					log.Println(err)
+				}
+			}
+		}
+	}
 }
