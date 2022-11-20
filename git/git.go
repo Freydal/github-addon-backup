@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+type Action = func(string, string) error
+
 func CleanAndPullRepo(path string, branch string) error {
 	c, err := gitClient.PlainOpen(path)
 	if err != nil {
