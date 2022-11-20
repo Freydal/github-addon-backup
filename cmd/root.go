@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"github-addon-backup/config"
-	"github-addon-backup/installations"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -18,13 +17,6 @@ var baseWowDir string
 var rootCmd = &cobra.Command{
 	Use:   "github-addon-backup",
 	Short: "Manage wow addons in a public github repository",
-	Run: func(cmd *cobra.Command, args []string) {
-		if pull {
-			installations.KeepUpToDate(baseWowDir)
-		} else {
-
-		}
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -40,7 +32,4 @@ func init() {
 	defaultPath := config.DefaultPathAndMessage()
 
 	rootCmd.Flags().StringVarP(&baseWowDir, "base-wow-directory", "d", defaultPath, "Base directory for World of Warcraft installation.")
-	rootCmd.Flags().BoolVarP(&pull, "pull", "p", false, "Help message for toggle")
 }
-
-
