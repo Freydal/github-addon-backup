@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+func Init(rootPath string) {
+	err := wowDirectoryWalk(rootPath, git.InitIfMissing)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func KeepUpToDate(rootPath string) {
 	err := wowDirectoryWalk(rootPath, git.CleanAndPullRepo)
 	if err != nil {

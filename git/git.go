@@ -11,6 +11,18 @@ import (
 
 type Action = func(string, string) error
 
+func InitIfMissing(path string, branch string) error {
+	c, err := gitClient.PlainOpen(path)
+
+	if c != nil && err != gitClient.ErrRepositoryNotExists {
+		return nil
+	}
+
+	log.Println("I need to create %s (%s)", path, branch)
+
+	return nil
+}
+
 func CleanAndPullRepo(path string, branch string) error {
 	c, err := gitClient.PlainOpen(path)
 	if err != nil {
@@ -109,6 +121,7 @@ func CleanAndPullRepo(path string, branch string) error {
 	if err != nil {
 		if err == gitClient.NoErrAlreadyUpToDate {
 			log.Println(fmt.Sprintf("Up to date! %s(%s)", path, head.Name()))
+			return nil
 		} else if err == gitClient.ErrNonFastForwardUpdate {
 
 			reference, err := c.Storer.Reference(plumbing.NewRemoteReferenceName("origin", branch))
@@ -136,6 +149,7 @@ func CleanAndPullRepo(path string, branch string) error {
 			return err
 		}
 	}
+
 	log.Println(fmt.Sprintf("Pulled %s(%s)", path, head.Name()))
 
 	return nil
