@@ -2,10 +2,16 @@ package git
 
 import (
 	"fmt"
+	"github-addon-backup/gh"
+	"github.com/go-git/go-billy/v5/osfs"
 	gitClient "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/cache"
+	"github.com/go-git/go-git/v5/storage/filesystem"
 	"log"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -18,7 +24,67 @@ func InitIfMissing(path string, branch string) error {
 		return nil
 	}
 
-	log.Println("I need to create %s (%s)", path, branch)
+	log.Println("Creating repo: %s (%s)", path, branch)
+
+	wt := osfs.New(path)
+	dotGit, err := wt.Chroot(".git")
+	if err != nil {
+		return err
+	}
+	fs := filesystem.NewStorage(dotGit, cache.NewObjectLRUDefault())
+
+	c, err = gitClient.Init(fs, wt)
+	if err != nil {
+		return err
+	}
+
+	worktree, err := c.Worktree()
+	if err != nil {
+		return err
+	}
+
+	branchRef := plumbing.NewBranchReferenceName(branch)
+	branchConfig := config.Branch{
+		Name:   branch,
+		Remote: "origin",
+		Merge:  branchRef,
+	}
+	err = c.CreateBranch(&branchConfig)
+	if err != nil {
+		return err
+	}
+
+	err = c.Storer.SetReference(plumbing.NewSymbolicReference("HEAD", branchRef))
+	if err != nil {
+		return err
+	}
+
+	_, err = worktree.Add(".")
+	if err != nil {
+		return err
+	}
+
+	_, err = worktree.Commit(
+		fmt.Sprintf("Initial commit: %s", time.Now().Format("1-_2-06")),
+		&gitClient.CommitOptions{
+			All: true,
+		})
+	if err != nil {
+		return err
+	}
+
+	name := filepath.Base(path)
+	name = strings.ReplaceAll(name, "#", "-hash-")
+
+	err = gh.RepoCreate(name, path)
+	if err != nil {
+		return err
+	}
+
+	err = c.Push(&gitClient.PushOptions{})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
